@@ -19,7 +19,6 @@ import pandas as pd
 import pystac_client
 import zarr
 from cartopy.feature import LAND
-from odc.algo import erase_bad, mask_cleanup
 from odc.geo.geobox import GeoBox, GeoboxTiles
 from odc.geo.xr import xr_zeros
 
@@ -226,11 +225,9 @@ class ChunkProcessingJob:
         allowed_values = [VEGETATION, NOT_VEGETATED]
 
         cloud_mask = ~ds.scl.isin(allowed_values)
-        cloud_mask = mask_cleanup(cloud_mask, [("closing", 5), ("opening", 5)])
-        ds_masked = erase_bad(ds[["red", "green", "blue"]], cloud_mask)
 
         rgb_median = (
-            ds_masked.where(ds_masked > 0)
+            ds.where(~cloud_mask)
             .to_dataarray(dim="band")
             .median(dim="time")
             .astype("uint16")

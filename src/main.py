@@ -6,7 +6,7 @@ from coiled_app import spawn_coiled_jobs
 from lib import JobConfig, save_output_log
 from lithops_app import spawn_lithops_jobs
 from modal_app import spawn_modal_jobs
-from storage import ArraylakeStorage, ZarrFSSpecStorage
+from storage import ZarrFSSpecStorage
 
 
 @click.command()

@@ -19,6 +19,15 @@ If you want to build on top of it, fork this repo and modify it to your needs.
 - [Arraylake](https://docs.earthmover.io/) - Earthmover's data lake platform for Zarr data
 - Any [fsspec](https://filesystem-spec.readthedocs.io/en/latest/)-compatible cloud storage location (e.g. S3)
 
+## Installation
+
+```bash
+virtualenv --python=/path/to/your/python venv
+source venv/bin/activate
+# depending on your chosen backend, you may need to install additional packages - lithops, coiled, or modal
+pip install zarr coiled odc odc-stac cartopy osmnx lithops modal s3fs
+```
+
 ## Usage
 
 ```
@@ -78,22 +87,21 @@ All of South America, one single month, store in Arraylake
 ```
 python src/main.py --start-date 2020-01-01 --end-date 2020-01-31 --bbox -82 -56 -34 13 --chunk-size 1800 \
 --arraylake-repo-name "earthmover-demos/sentinel-datacube-South-America" --arraylake-bucket-nickname earthmover-demo-bucket
---storage-backend arraylake --serverless-backend lithops 
+--storage-backend arraylake --serverless-backend lithops
 ```
 
 All of South America, 12 months, store in plain S3 bucket
 
+```bash
+python src/main.py --start-date 2020-01-01 --end-date 2020-01-01 --bbox -72 -46 -70 -44 \
+  --storage-backend fsspec --fsspec-uri s3://nasa-eodc-scratch/zarr-datacubes/sentinel-2-c1-l2a/South-America \
+  --serverless-backend lithops
 ```
- python src/main.py --start-date 2020-01-01 --end-date 2020-12-31 --bbox -82 -56 -34 13 \
- --storage-backend fsspec --fsspec-uri s3://earthmover-sample-data/zarr-datacubes/South-America\
-  --serverless-backend modal
-```
-
 
 ## Lithops Setup
 
-
 ```
 lithops runtime build -f PipDockerfile -b aws_lambda serverless-datacube
+# `--memory <MB>` must be the same as the runtime_memory allocated to the lambda function in lithops_app.py
+lithops runtime deploy -b aws_lambda --memory 4096 serverless-datacube
 ```
-

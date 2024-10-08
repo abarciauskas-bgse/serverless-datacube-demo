@@ -7,7 +7,8 @@ from lib import ChunkProcessingJob, ChunkProcessingResult
 stub = modal.Stub("serverless-datacube")
 
 image = (
-    modal.Image.micromamba(python_version="3.10")
+    modal.Image.micromamba(python_version="3.11")
+    .apt_install("libquadmath0")
     .micromamba_install(
         "arraylake",
         "pystac-client",
@@ -18,12 +19,13 @@ image = (
         "cartopy",
         "zarr>=2.17.2",
         "s3fs",
+        "numpy",
         channels=["conda-forge"],
     )
     .pip_install("pydantic==2.5.3", "fastapi==0.109.0")
     .env(
         {
-            "SSL_CERT_FILE": "/opt/conda/lib/python3.10/site-packages/certifi/cacert.pem",  # noqa: E501
+            "SSL_CERT_FILE": "/opt/conda/lib/python3.11/site-packages/certifi/cacert.pem",  # noqa: E501
             "ZARR_V3_EXPERIMENTAL_API": "1",
         }
     )
@@ -33,8 +35,8 @@ image = (
 @stub.function(
     image=image,
     secrets=[
-        modal.Secret.from_name("ryan-aws-secret"),
-        modal.Secret.from_name("arraylake-token"),
+        modal.Secret.from_name("aimeeb-aws-secret"),
+        #modal.Secret.from_name("arraylake-token"),
     ],
     mounts=[modal.Mount.from_local_python_packages("lib")],
 )
